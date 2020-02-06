@@ -1,0 +1,94 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <title>Card Master</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="UTF-8">
+    <link rel="stylesheet" type="text/css" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+    <link rel="stylesheet" type="text/css" href="cmg.css">     
+</head>
+<body>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.1.0/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/angular.js/1.5.8/angular.min.js"></script>    
+    <script src="cmg.js"></script>
+    <div class="option-nav">
+        <div id="player-nav">
+            Player: <span id="player"></span>
+        </div>
+        <div id="option" class="btn">
+            <i class="fa fa-cog" aria-hidden="true"></i>
+            <span class="tooltiptext">OPTION</span>
+        </div>
+        <div id="undo-btn" class="btn">
+            <i class="fa fa-undo" aria-hidden="true"></i>
+            <span class="tooltiptext">UNDO</span>
+        </div>
+    </div>
+    <div id="reserve01">
+        <div class="row">
+            <div class="box" id="box-R01-0-0" piece="">
+            </div>
+            <div class="box" id="box-R01-0-1" piece="">
+            </div>
+            <div class="box" id="box-R01-0-2" piece="">
+            </div>
+            <div class="box" id="box-R01-0-3" piece="">
+            </div>
+            <div class="box" id="box-R01-0-4" piece="">
+            </div>
+            <div class="box" id="box-R01-0-5" piece="">
+            </div>
+            <div class="box" id="box-R01-0-6" piece="">
+            </div>
+            <div class="box" id="box-R01-0-7" piece="">
+            </div>
+        </div>
+    </div>
+    <div id="board">
+        <div id="result" class="hide"></div>
+        <div id="pawn-promotion-option" class="hide">
+            <span id="queen" class="option"></span>
+            <span id="rook" class="option"></span>
+            <span id="knight" class="option"></span>
+            <span id="bishop" class="option"></span>
+        </div>
+        <div id="option-menu" class="hide">
+            <div id="back-btn" class="button">BACK</div>
+            <div id="theme-menu">
+                THEME: <span id="theme-option" class="button"></span>
+            </div>
+            <div id="color-menu">
+                COLOR: <span id="color-option" class="button"></span>
+            </div>
+            <div id="restart-btn" class="button">NEW GAME</div>
+        </div>
+        <div id="game" ng-app="cmg" ng-controller="GameController">
+            <div class="row" ng-repeat="y in widths">
+                <div class="box" ng-repeat="x in widths" ng-attr-id="{{'box-' + x + '-' + y}}" piece="">
+                </div>
+            </div>
+        </div>
+    </div>
+    <div id="reserve02">
+        <div class="row">
+            <div class="box" id="box-R02-0-0" piece="">
+            </div>
+            <div class="box" id="box-R02-0-1" piece="">
+            </div>
+            <div class="box" id="box-R02-0-2" piece="">
+            </div>
+            <div class="box" id="box-R02-0-3" piece="">
+            </div>
+            <div class="box" id="box-R02-0-4" piece="">
+            </div>
+            <div class="box" id="box-R02-0-5" piece="">
+            </div>
+            <div class="box" id="box-R02-0-6" piece="">
+            </div>
+            <div class="box" id="box-R02-0-7" piece="">
+            </div>
+        </div>
+    </div>
+
+</body>
+</html>
