@@ -16,12 +16,6 @@ angular.module('cmg', []).controller('GameController', ['$scope', function($scop
 $(document).ready(function() {   
     var themes = [
         {
-            //name: 'CLASSIC',
-            //boardBorderColor: '#666',
-            //lightBoxColor: '#fff',
-            //darkBoxColor: '#ccc',
-            //optionColor: '#000',
-            //optionHoverColor: '#999'
             name: 'CLASSIC',
             boardBorderColor: '#666',
             lightBoxColor: 'transparent',
@@ -30,14 +24,8 @@ $(document).ready(function() {
             optionHoverColor: '#999'
         },
         {   
-            //name: 'WOOD',
-            //boardBorderColor: '#803E04',
-            //lightBoxColor: '#FFCE9E',
-            //darkBoxColor: '#D18B47',
-            //optionColor: '#803E04',
-            //optionHoverColor: '#311B0B'
             name: 'WOOD',
-            boardBorderColor: '#000000',
+            boardBorderColor: '##803E04',
             lightBoxColor: 'transparent',
             darkBoxColor: 'transparent',
             optionColor: '#803E04',
@@ -207,35 +195,22 @@ $(document).ready(function() {
 	$(function() {		 
 		$('#player').html(chessPieces.black.king);
 
-		 ////Set up color for boxes, chess pieces
-		 //for(var i = 0; i < 8; i++) {
-		 //     for(var j = 0; j < 8; j++) {
-		 //   		var box = $('#box-R01-' + i + '-' + j);
-		 //   		if((i + j) % 2 !== 0) {
-		 //   			 box.addClass('light-box');
-		 //   		} else {
-		 //   			 box.addClass('dark-box');
-		 //   		}
-		 //   		setNewBoard(box, i, j); //Set up all chess pieces
-		 //     }
-		 //}
+
 	    //Set up color for boxes, chess pieces
-		 for (var i = 0; i < 1; i++) {
-		     for (var j = 0; j < 8; j++) {
-		         var box = $('#box-R01-' + i + '-' + j);
+		 for (var y = 0; y < 1; y++) {
+		     for (var x = 0; x < 8; x++) {
+		         var box = $('#box-R01-' + x + '-' + y);
 		         box.addClass('dark-box');
 		         r = 1;
-		         console.log(r);
-		         setNewBoard(box, i, j, r); //Set up all chess pieces
+		         setNewBoard(box, x, y, r); //Set up all chess pieces
 		     }
 		 }
-		 for (var i = 0; i < 1; i++) {
-		     for (var j = 0; j < 8; j++) {
-		         var box = $('#box-R02-' + i + '-' + j);
+		 for (var y = 0; y < 1; y++) {
+		     for (var x = 0; x < 8; x++) {
+                 var box = $('#box-R02-' + x + '-' + y);
 		         box.addClass('light-box');
 		         r = 2;
-		         console.log(r);
-		         setNewBoard(box, i, j, r); //Set up all chess pieces
+                 setNewBoard(box, x, y, r); //Set up all chess pieces
 		     }
 		 }
 		 setColor();
@@ -404,8 +379,8 @@ $(document).ready(function() {
 		 var type = selectedPieceInfo[1];
 
 		 var id = selectedBox.split('-');
-		 var i = parseInt(id[1]);
-		 var j = parseInt(id[2]);
+		 var i = parseInt(id[2]);
+		 var j = parseInt(id[3]);
 
 		 var nextMoves = [];
 
@@ -413,14 +388,15 @@ $(document).ready(function() {
 			  case 'pawn':
 					if(color === 'black') {
 						 var moves = [
-							  [0, 1], [0, 2], [1, 1], [-1, 1]
+                             [0, 0], [0, 1], [0, 2], [0, 3], [1, 0], [1, 1], [1, 2], [1, 3],
+                             [2, 0], [2, 1], [2, 2], [2, 3], [3, 0], [3, 1], [3, 2], [3, 3]
 						 ];
 					} else {
 						 var moves = [
 							  [0, -1], [0, -2], [1, -1], [-1, -1]
 						 ];
 					}
-					nextMoves = getPawnMoves(i, j, color, moves);
+					nextMoves = getPawnMoves(0, 0, color, moves);
 					break;
 			  case 'rook':
 					var moves = [
@@ -460,7 +436,7 @@ $(document).ready(function() {
 					break;
 			  default: 
 					break;
-		 }
+         }
 		 return nextMoves;
 	}
 
@@ -469,29 +445,18 @@ $(document).ready(function() {
 		 var nextMoves = [];
 		 for(var index = 0; index < moves.length; index++) {
 			  var tI = i + moves[index][0];
-			  var tJ = j + moves[index][1];
-			  if( !outOfBounds(tI, tJ) ) {
-					var box = $('#box-' + tI + '-' + tJ);
-
-					if(index === 0) { //First line
-						 if(!box.hasClass('placed')) {
-							  nextMoves.push([tI, tJ]);
-						 } else {
-							  index++;
-						 }
-					} else if(index === 1) { //First line
-						 if( ((color === 'black' && j === 1) ||
-								 (color === 'white' && j === 6)) &&
-							  !box.hasClass('placed')) {
-							  nextMoves.push([tI, tJ]);
-						 }
-					} else if(index > 1) { //Other lines
-						 if(box.attr('piece') !== '' && box.attr('piece').indexOf(color) < 0) {
-							  nextMoves.push([tI, tJ]);
-						 }
-					}
-			  }
-		 }
+              var tJ = j + moves[index][1];
+             if (!outOfBounds(tI, tJ)) {
+                 var box = $('#box-' + tI + '-' + tJ);
+                 if (box.attr('piece') == '') {
+                     nextMoves.push([tI, tJ]);
+                 }
+             }
+             else {
+                 console.log(tI + '-' + tJ);
+             }
+         }
+         console.log(nextMoves);
 		 return nextMoves;
 	}
 
@@ -546,7 +511,7 @@ $(document).ready(function() {
 	//Show possible moves by add suggestion to boxes
 	var suggestNextMoves = function(nextMoves) {
 		 for(var move of nextMoves) {
-			  var box = $('#box-' + move[0] + '-' + move[1]);
+              var box = $('#box-' + move[0] + '-' + move[1]);
 			  box.addClass('suggest');
 		 }
 	}
@@ -555,7 +520,6 @@ $(document).ready(function() {
 
 	//Set up piece for clicked box
 	var setPiece = function(box, color, type) {
-
 		 //Check end game (if king is defeated)
 		 if(box.attr('piece').indexOf('king') >= 0) {
 			  showWinner(player);
@@ -593,7 +557,7 @@ $(document).ready(function() {
 	}
 
 	//Delete selected element
-	var deleteBox = function(box) {
+    var deleteBox = function (box) {
 		 box.removeClass('placed');
 		 box.removeClass('selected');
 		 box.removeClass('suggest');
@@ -601,71 +565,42 @@ $(document).ready(function() {
 		 box.attr('piece', '');
 	}
 
-	//Default board state
+	//Default reserve state
 	var setNewBoard = function(box, i, j, r) {
-		 //if(j === 7) {
-		 //     if(i === 0 || i === 7) {
-		 //   		setPiece(box, 'white', 'rook');
-		 //     } else if(i === 1 || i === 6) {
-		 //   		setPiece(box, 'white', 'knight');
-		 //     } else if(i === 2 || i === 5) {
-		 //   		setPiece(box, 'white', 'bishop');
-		 //     } else if(i === 3) {
-		 //   		setPiece(box, 'white', 'queen');
-		 //     } else if(i === 4) {
-		 //   		setPiece(box, 'white', 'king');
-		 //     }
-		 //} else if(j === 6) {
-		 //     setPiece(box, 'white', 'pawn');
-		 //} else if(j === 1) {
-		 //     setPiece(box, 'black', 'pawn');
-		 //} else if(j === 0) {
-		 //     if(i === 0 || i === 7) {
-		 //   		setPiece(box, 'black', 'rook');
-		 //     } else if(i === 1 || i === 6) {
-		 //   		setPiece(box, 'black', 'knight');
-		 //     } else if(i === 2 || i === 5) {
-		 //   		setPiece(box, 'black', 'bishop');
-		 //     } else if(i === 3) {
-		 //   		setPiece(box, 'black', 'queen');
-		 //     } else if(i === 4) {
-		 //   		setPiece(box, 'black', 'king');
-		 //     }
-	    //}
 	    if (r === 2) {
-	        if (j === 0) {
-	            setPiece(box, 'white', 'rook');
-	        } else if (j === 1) {
+	        if (i === 0) {
+	            setPiece(box, 'white', 'pawn');
+	        } else if (i === 1) {
 	            setPiece(box, 'white', 'knight');
-	        } else if (j === 2) {
+	        } else if (i === 2) {
 	            setPiece(box, 'white', 'bishop');
-	        } else if (j === 3) {
+	        } else if (i === 3) {
 	            setPiece(box, 'white', 'queen');
-	        } else if (j === 4) {
+	        } else if (i === 4) {
 	            setPiece(box, 'white', 'king');
-	        } else if (j === 5) {
-	            setPiece(box, 'white', 'pawn');
-	        } else if (j === 6) {
-	            setPiece(box, 'white', 'pawn');
-	        } else if (j === 7) {
+	        } else if (i === 5) {
+                setPiece(box, 'white', 'pawn');
+	        } else if (i === 6) {
+                setPiece(box, 'white', 'rook');
+	        } else if (i === 7) {
 	            setPiece(box, 'white', 'pawn');
 	        }
 	    } else if (r === 1) {
-	        if (j === 0) {
-	            setPiece(box, 'black', 'rook');
-	        } else if (j === 1) {
+	        if (i === 0) {
+	            setPiece(box, 'black', 'pawn');
+	        } else if (i === 1) {
 	            setPiece(box, 'black', 'knight');
-	        } else if (j === 2) {
+	        } else if (i === 2) {
 	            setPiece(box, 'black', 'bishop');
-	        } else if (j === 3) {
+	        } else if (i === 3) {
 	            setPiece(box, 'black', 'queen');
-	        } else if (j === 4) {
+	        } else if (i === 4) {
 	            setPiece(box, 'black', 'king');
-	        } else if (j === 5) {
-	            setPiece(box, 'black', 'pawn');
-	        } else if (j === 6) {
-	            setPiece(box, 'black', 'pawn');
-	        } else if (j === 7) {
+	        } else if (i === 5) {
+                setPiece(box, 'black', 'pawn');
+	        } else if (i === 6) {
+                setPiece(box, 'black', 'rook');
+	        } else if (i === 7) {
 	            setPiece(box, 'black', 'pawn');
 	        }
 	    }
@@ -690,13 +625,24 @@ $(document).ready(function() {
 		 $('#option-menu').addClass('hide');
 		 $('#game').css('opacity', '1');
 
-		 //Set up color for boxes, chess pieces
-		 for(var i = 0; i < 8; i++) {
-			  for(var j = 0; j < 8; j++) {
-					var box = $('#box-' + i + '-' + j);
-					setNewBoard(box, i, j);
-			  }
-		 }
+         //Set up color for boxes, cards
+         for (var y = 0; y < 1; y++) {
+             for (var x = 0; x < 8; x++) {
+                 var box = $('#box-R01-' + x + '-' + y);
+                 box.addClass('dark-box');
+                 r = 1;
+                 setNewBoard(box, x, y, r); //Set up player 1 cards
+             }
+         }
+         for (var y = 0; y < 1; y++) {
+             for (var x = 0; x < 8; x++) {
+                 var box = $('#box-R02-' + x + '-' + y);
+                 box.addClass('light-box');
+                 r = 2;
+                 setNewBoard(box, x, y, r); //Set up all player 2 cards
+             }
+         }
+
 
 		 //Set global variables to default
 		 player = 'black';
