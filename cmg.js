@@ -203,18 +203,18 @@ $(document).ready(function() {
 	var promotion = {};
 
 
-    //Set up board game
+    //Define tabuleiro
 	$(function () {
 	    $('#jogador').html(cards.vermelho.king);
 
 
-	    //Set up color for boxes, chess cartas
+	    //Define cores para boxes, cartas
 	    for (var y = 0; y < 1; y++) {
 	        for (var x = 0; x < 8; x++) {
 	            var box = $('#box-R01-' + x + '-' + y);
 	            box.addClass('ng-scope'); //ng-scope para definir imagem
 	            r = 1;
-	            setNewBoard(box, x, y, r); //Set up all chess cartas
+	            setNewBoard(box, x, y, r); //Define todas as cartas
 	        }
 	    }
 	    for (var y = 0; y < 1; y++) {
@@ -223,7 +223,7 @@ $(document).ready(function() {
 	            box.addClass('ng-scope');
 	            //box.addClass('light-box');
 	            r = 2;
-	            setNewBoard(box, x, y, r); //Set up all chess cartas
+	            setNewBoard(box, x, y, r); //Define todas as cartas
 	        }
 	    }
 	    setColor();
@@ -233,7 +233,7 @@ $(document).ready(function() {
     //==============CLICK EVENTS==================//
 
 	$(function () {
-	    //Option menu
+	    //Menu de opcoes
 	    $('#option').on('click', function () {
 	        if ($('#option-menu').hasClass('hide')) {
 	            $('#game').css('opacity', '0.3');
@@ -244,14 +244,14 @@ $(document).ready(function() {
 	        }
 	    });
 
-	    //Back button
-	    //Return to game
+	    //Botao de voltar
+	    //Volta ao jogo
 	    $('#back-btn').on('click', function () {
 	        $('#option-menu').addClass('hide');
 	        $('#game').css('opacity', '1');
 	    });
 
-	    //Undo button 
+	    //Botao de desfazer
 	    $('#undo-btn').on('click', function () {
 	        if (historyMoves.length === 0) {
 	            return;
@@ -272,7 +272,7 @@ $(document).ready(function() {
 	            defineCarta($('#' + current.box), current.carta.split('-')[0], current.carta.split('-')[1]);
 	        }
 
-	        //Reset all changes
+	        //Redefine todas mudancas
 	        $('.box').removeClass('selected');
 	        $('.box').removeClass('suggest');
 
@@ -295,12 +295,12 @@ $(document).ready(function() {
 	        promotion = {};
 	    });
 
-	    //Reset game
+	    //Reinicia jogo
 	    $('#restart-btn').on('click', function () {
 	        resetGame();
 	    });
 
-	    //Restart when game over
+	    //Reinicia o jogo apos termino
 	    $('#result').on('click', function () {
 	        resetGame();
 	    });
@@ -315,11 +315,11 @@ $(document).ready(function() {
 	            return;
 	        }
 
-	        //Select new box
+	        //Seleciona novo box
 	        if (!select.canMove) {
-	            //Check the right color to play
+	            //verifica a cor correta a jogar
 	            if ($(this).attr('carta').indexOf(jogador) >= 0) {
-	                //Select a carta to move
+	                //Seleciona a carta a mover
 	                selecionaCarta($(this));
 	            }
 	        }
@@ -339,10 +339,10 @@ $(document).ready(function() {
 	                return;
 	            }
 
-	            //Can move if it is valid
+	            //Pode mover se e valido
 	            if ($(this).hasClass('suggest')) {
 
-	                //Save move in history
+	                //Salava movimento no historico
 	                var move = {
 	                    previous: {},
 	                    current: {}
@@ -383,18 +383,10 @@ $(document).ready(function() {
 	    suggestNextMoves(getNextMoves());
 	}
 
-    //CALCULATE VALID MOVES=======//
+    //CALCULA MOVIMENTOS VALIDOS=======//
 
-    //Returns possible moves of the selected carta
+    //Retorna movimentos possiveis da carta selecionada
 	var getNextMoves = function () {
-	//var getNextMoves = function (selectedcarta, selectedBox) {
-	    //var selectedcartaInfo = selectedcarta.split('-');
-	    //var color = selectedcartaInfo[0];
-	    //var type = selectedcartaInfo[1];
-
-	    //var id = selectedBox.split('-');
-	    //var i = parseInt(id[2]);
-	    //var j = parseInt(id[3]);
 
 	    var nextMoves = [];
 
@@ -790,7 +782,7 @@ $(document).ready(function() {
 	    for (var y = 0; y < 1; y++) {
 	        for (var x = 0; x < 8; x++) {
 	            var box = $('#box-R01-' + x + '-' + y);
-	            box.addClass('dark-box');
+	            box.addClass('ng-scope');
 	            r = 1;
 	            setNewBoard(box, x, y, r); //Define cards do jogador 1
 	        }
@@ -798,14 +790,14 @@ $(document).ready(function() {
 	    for (var y = 0; y < 1; y++) {
 	        for (var x = 0; x < 8; x++) {
 	            var box = $('#box-R02-' + x + '-' + y);
-	            box.addClass('light-box');
+	            box.addClass('ng-scope');
 	            r = 2;
 	            setNewBoard(box, x, y, r); //Define cards do jogador 2
 	        }
 	    }
 
 
-	    //Set global variables to default
+	    //Define variaveis global para o padrao
 	    jogador = 'vermelho';
 	    select = {
 	        canMove: false,
@@ -817,19 +809,19 @@ $(document).ready(function() {
 	    promotion = {};
 	}
 
-    //Announce the winner
+    //Anuncia o vencedor
 	var showWinner = function (winner) {
 
 	    historyMoves = [];
 	    promotion = {};
 
 	    setTimeout(function () {
-	        if (winner === 'DRAW') { //Game is draw
+	        if (winner === 'DRAW') { //Jogo empatou
 	            $('#result').css('color', '#000');
 	            $('#result').html(winner);
-	        } else { //There is a winner
+	        } else { //Ha um vencedor
 	            $('#result').css('color', winner + '');
-	            $('#result').html(cards[winner].king + ' wins!');
+	            $('#result').html(cards[winner].king + ' ganhou!');
 	        }
 	        $('#result').removeClass('hide');
 	        $('#game').css('opacity', '0.5');
