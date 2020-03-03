@@ -1,12 +1,11 @@
-angular.module('cmg', []).controller('GameController', ['$scope', function($scope) {
+angular.module('cmg', []).controller('ControladorJogo', ['$scope', function ($scope) {
 	
-	//Draw the board game
-    $scope.size = 4;
-    $scope.widths = [];
+	//Desenha o tabuleiro
+    $scope.tamanho = 4;
+    $scope.campos = [];
 
-    //Draw board
-    for(var i = 0; i < $scope.size; i++) { 
-        $scope.widths.push(i);
+    for (var i = 0; i < $scope.tamanho; i++) {
+        $scope.campos.push(i);
     }
 
 
@@ -71,7 +70,7 @@ $(document).ready(function() {
     
     var colors = [
         {
-            name: 'BLACK',
+            name: 'vermelho',
             color: '#000'
         }, 
         {
@@ -153,7 +152,7 @@ $(document).ready(function() {
         setColor();
     });
     
-    //Set up color for chess pieces
+    //Set up color for chess cartas
     var setColor = function() {
         var color = colors[colorOption];
         
@@ -163,25 +162,23 @@ $(document).ready(function() {
         
         $('#pawn-promotion-option').css('color', color['color']);
         
-        $('#player').css('color', color['color']);
+        $('#jogador').css('color', color['color']);
     }
 	 
 	 //=====GLOBAL VARIABLES=========//
 
-	//Chess pieces
-	var chessPieces = {
-		 'white': {
-			  'king': '&#9812;',
+	//Cards
+	var cards = {
+		 'azul': {
+			  'king': '2',
 			  'queen': '&#9813;',
 			  'rook': '&#9814;',
 			  'bishop': '&#9815;',
 			  'knight': '&#9816;',
 		      'pawn': '&#9817;'
-		      //'pawn': 'cards\logoSIPAI-transp.png'
-			  //'pawn': '<link href="cards\logoSIPAI-transp.png">'
 		 },
-		 'black': {
-			  'king': '&#9818;',
+		 'vermelho': {
+		      'king': '1',
 			  'queen': '&#9819;',
 			  'rook': '&#9820;',
 			  'bishop': '&#9821;',
@@ -190,16 +187,16 @@ $(document).ready(function() {
 		 }
 	};
 
-	var player = 'black'; //First player
+	var jogador = 'vermelho'; //First jogador
 
-	//Selected chess piece to move
+	//Selected chess carta to move
 	var select = {
 		 canMove: false, //Ready to move of not
-		 piece: '',      //Color, type of the piece
-		 box: ''         //Position of the piece
+		 carta: '',      //Color, type of the carta
+		 box: ''         //Position of the carta
 	}
 
-	//Game's history (pieces + positions)
+	//Game's history (cartas + positions)
 	var historyMoves = [];
 
 	//Position and color of pawn promotion
@@ -208,16 +205,16 @@ $(document).ready(function() {
 
     //Set up board game
 	$(function () {
-	    $('#player').html(chessPieces.black.king);
+	    $('#jogador').html(cards.vermelho.king);
 
 
-	    //Set up color for boxes, chess pieces
+	    //Set up color for boxes, chess cartas
 	    for (var y = 0; y < 1; y++) {
 	        for (var x = 0; x < 8; x++) {
 	            var box = $('#box-R01-' + x + '-' + y);
 	            box.addClass('ng-scope'); //ng-scope para definir imagem
 	            r = 1;
-	            setNewBoard(box, x, y, r); //Set up all chess pieces
+	            setNewBoard(box, x, y, r); //Set up all chess cartas
 	        }
 	    }
 	    for (var y = 0; y < 1; y++) {
@@ -226,7 +223,7 @@ $(document).ready(function() {
 	            box.addClass('ng-scope');
 	            //box.addClass('light-box');
 	            r = 2;
-	            setNewBoard(box, x, y, r); //Set up all chess pieces
+	            setNewBoard(box, x, y, r); //Set up all chess cartas
 	        }
 	    }
 	    setColor();
@@ -263,34 +260,34 @@ $(document).ready(function() {
 	        var move = historyMoves.pop();
 
 	        var previous = move.previous;
-	        setPiece($('#' + previous.box), previous.piece.split('-')[0], previous.piece.split('-')[1]);
+	        defineCarta($('#' + previous.box), previous.carta.split('-')[0], previous.carta.split('-')[1]);
 
 	        var current = move.current;
-	        if (current.piece === '') {
+	        if (current.carta === '') {
 	            var currentBox = $('#' + current.box);
 	            currentBox.html('');
-	            currentBox.attr('piece', '');
+	            currentBox.attr('carta', '');
 	            currentBox.removeClass('placed');
 	        } else {
-	            setPiece($('#' + current.box), current.piece.split('-')[0], current.piece.split('-')[1]);
+	            defineCarta($('#' + current.box), current.carta.split('-')[0], current.carta.split('-')[1]);
 	        }
 
 	        //Reset all changes
 	        $('.box').removeClass('selected');
 	        $('.box').removeClass('suggest');
 
-	        switchPlayer();
+	        trocaJogador();
 
-	        select = { canMove: false, piece: '', box: '' };
+	        select = { canMove: false, carta: '', box: '' };
 	    });
 
 	    //Pawn promotion event
 	    $('#pawn-promotion-option .option').on('click', function () {
 
 	        var newType = $(this).attr('id');
-	        promotion.box.html(chessPieces[promotion.color][newType]);
+	        promotion.box.html(cards[promotion.color][newType]);
 	        promotion.box.addClass('placed');
-	        promotion.box.attr('piece', promotion.color + '-' + newType);
+	        promotion.box.attr('carta', promotion.color + '-' + newType);
 
 	        $('#pawn-promotion-option').addClass('hide');
 	        $('#game').css('opacity', '1');
@@ -314,31 +311,31 @@ $(document).ready(function() {
 	            $(this).removeClass('selected');
 
 	            $('.box').removeClass('suggest');
-	            select = { canMove: false, piece: '', box: '' };
+	            select = { canMove: false, carta: '', box: '' };
 	            return;
 	        }
 
 	        //Select new box
 	        if (!select.canMove) {
 	            //Check the right color to play
-	            if ($(this).attr('piece').indexOf(player) >= 0) {
-	                //Select a piece to move
-	                selectPiece($(this));
+	            if ($(this).attr('carta').indexOf(jogador) >= 0) {
+	                //Select a carta to move
+	                selecionaCarta($(this));
 	            }
 	        }
 
-	            //Set up new destination for selected box
+	        //Set up new destination for selected box
 	        else if (select.canMove) {
-	            var selectedPieceInfo = select.piece.split('-');
-	            var color = selectedPieceInfo[0];
-	            var type = selectedPieceInfo[1];
+	            var selectedcartaInfo = select.carta.split('-');
+	            var color = selectedcartaInfo[0];
+	            var type = selectedcartaInfo[1];
 
-	            //Select new piece to move if 2 colors are the same
-	            if ($(this).attr('piece').indexOf(color) >= 0) {
+	            //Select new carta to move if 2 colors are the same
+	            if ($(this).attr('carta').indexOf(color) >= 0) {
 	                $('#' + select.box).removeClass('selected');
 	                $('.box').removeClass('suggest');
-	                //Select a piece to move
-	                selectPiece($(this));
+	                //Select a carta to move
+	                selecionaCarta($(this));
 	                return;
 	            }
 
@@ -351,124 +348,75 @@ $(document).ready(function() {
 	                    current: {}
 	                }
 
-	                move.previous.piece = select.piece;
+	                move.previous.carta = select.carta;
 	                move.previous.box = select.box;
 
-	                move.current.piece = $(this).attr('piece');
+	                move.current.carta = $(this).attr('carta');
 	                move.current.box = $(this).attr('id');
 
 	                historyMoves.push(move);
 
-	                //Move selected piece successfully
-	                setPiece($(this), color, type);
+	                //Move carta selecionada com sucesso
+	                defineCarta($(this), color, type);
 
-	                //Delete moved box
+	                //Apaga box movido
 	                deleteBox($('#' + select.box));
 
 	                $('.box').removeClass('suggest');
 
-	                select = { canMove: false, piece: '', box: '' };
+	                select = { canMove: false, carta: '', box: '' };
 
-	                //Switch player
-	                switchPlayer();
+	                //Troca jogador
+	                trocaJogador();
 	            }
 	        }
 	    });
 	});
 
-    //Get piece and position of the selected piece
-	var selectPiece = function (box) {
+    //Guarda carta e posicao da carta selecionada
+	var selecionaCarta = function (box) {
 	    box.addClass('selected');
 	    select.box = box.attr('id');
-	    select.piece = box.attr('piece');
+	    select.carta = box.attr('carta');
 	    select.canMove = true;
 
-	    suggestNextMoves(getNextMoves(select.piece, select.box));
+	    suggestNextMoves(getNextMoves());
 	}
 
     //CALCULATE VALID MOVES=======//
 
-    //Returns possible moves of the selected piece
-	var getNextMoves = function (selectedPiece, selectedBox) {
-	    var selectedPieceInfo = selectedPiece.split('-');
-	    var color = selectedPieceInfo[0];
-	    var type = selectedPieceInfo[1];
+    //Returns possible moves of the selected carta
+	var getNextMoves = function () {
+	//var getNextMoves = function (selectedcarta, selectedBox) {
+	    //var selectedcartaInfo = selectedcarta.split('-');
+	    //var color = selectedcartaInfo[0];
+	    //var type = selectedcartaInfo[1];
 
-	    var id = selectedBox.split('-');
-	    var i = parseInt(id[2]);
-	    var j = parseInt(id[3]);
+	    //var id = selectedBox.split('-');
+	    //var i = parseInt(id[2]);
+	    //var j = parseInt(id[3]);
 
 	    var nextMoves = [];
 
-	    switch (type) {
-	        case 'pawn':
-	            if (color === 'black') {
-	                var moves = [
+        //todas as areas do tabuleiro
+	    var moves = [
                         [0, 0], [0, 1], [0, 2], [0, 3], [1, 0], [1, 1], [1, 2], [1, 3],
                         [2, 0], [2, 1], [2, 2], [2, 3], [3, 0], [3, 1], [3, 2], [3, 3]
-	                ];
-	            } else {
-	                var moves = [
-                        [0, 0], [0, 1], [0, 2], [0, 3], [1, 0], [1, 1], [1, 2], [1, 3],
-                        [2, 0], [2, 1], [2, 2], [2, 3], [3, 0], [3, 1], [3, 2], [3, 3]
-	                ];
-	            }
-	            nextMoves = getPawnMoves(0, 0, color, moves);
-	            break;
-	        case 'rook':
-	            var moves = [
-                        [0, 0], [0, 1], [0, 2], [0, 3], [1, 0], [1, 1], [1, 2], [1, 3],
-                        [2, 0], [2, 1], [2, 2], [2, 3], [3, 0], [3, 1], [3, 2], [3, 3]
-	            ];
-	            nextMoves = getQueenMoves(i, j, color, moves);
-	            break;
-	        case 'knight':
-	            var moves = [
-                        [0, 0], [0, 1], [0, 2], [0, 3], [1, 0], [1, 1], [1, 2], [1, 3],
-                        [2, 0], [2, 1], [2, 2], [2, 3], [3, 0], [3, 1], [3, 2], [3, 3]
-	            ];
-	            nextMoves = getKnightMoves(i, j, color, moves);
-	            break;
-	        case 'bishop':
-	            var moves = [
-                        [0, 0], [0, 1], [0, 2], [0, 3], [1, 0], [1, 1], [1, 2], [1, 3],
-                        [2, 0], [2, 1], [2, 2], [2, 3], [3, 0], [3, 1], [3, 2], [3, 3]
-	            ];
-	            nextMoves = getQueenMoves(i, j, color, moves);
-	            break;
-	        case 'queen':
-	            var moves = [
-                        [0, 0], [0, 1], [0, 2], [0, 3], [1, 0], [1, 1], [1, 2], [1, 3],
-                        [2, 0], [2, 1], [2, 2], [2, 3], [3, 0], [3, 1], [3, 2], [3, 3]
-	            ];
-	            var moves2 = [
-                     [0, 1], [0, -1], [1, 0], [-1, 0]
-	            ];
-	            nextMoves = getQueenMoves(i, j, color, moves1)
-                                .concat(getQueenMoves(i, j, color, moves2));
-	            break;
-	        case 'king':
-	            var moves = [
-                        [0, 0], [0, 1], [0, 2], [0, 3], [1, 0], [1, 1], [1, 2], [1, 3],
-                        [2, 0], [2, 1], [2, 2], [2, 3], [3, 0], [3, 1], [3, 2], [3, 3]
-	            ];
-	            nextMoves = getKnightMoves(i, j, color, moves);
-	            break;
-	        default:
-	            break;
-	    }
-	    return nextMoves;
+	    ];
+	    nextMoves = getCardMoves(0, 0, moves); //busca locais possiveis de se colocar a carta
+
+	    return nextMoves; //retorna locais possiveis
 	}
 
-    //Calculate next moves for pawn pieces
-	var getPawnMoves = function (i, j, color, moves) {
+    //retorna movimentos possiveis no tabuleiro
+	var getCardMoves = function (i, j, moves) {
 	    var nextMoves = [];
 	    for (var index = 0; index < moves.length; index++) {
 	        var tI = i + moves[index][0];
 	        var tJ = j + moves[index][1];
 	        if (!outOfBounds(tI, tJ)) {
 	            var box = $('#box-' + tI + '-' + tJ);
-	            if (box.attr('piece') == '') {
+	            if (box.attr('carta') == '') {
 	                nextMoves.push([tI, tJ]);
 	            }
 	        }
@@ -476,59 +424,15 @@ $(document).ready(function() {
 	            console.log(tI + '-' + tJ);
 	        }
 	    }
-	    console.log(nextMoves);
 	    return nextMoves;
 	}
 
-    //Calculate next move of rook, bishop and queen pieces
-	var getQueenMoves = function (i, j, color, moves) {
-	    var nextMoves = [];
-	    for(var move of moves) {
-	        var tI = i + move[0];
-	        var tJ = j + move[1];
-	        var sugg = true;
-	        while (sugg && !outOfBounds(tI, tJ)) {
-	            var box = $('#box-' + tI + '-' + tJ);
-	            if (box.hasClass('placed')) {
-	                if (box.attr('piece').indexOf(color) >= 0) {
-	                    sugg = false;
-	                } else {
-	                    nextMoves.push([tI, tJ]);
-	                    sugg = false;
-	                }
-	            }
-	            if (sugg) {
-	                nextMoves.push([tI, tJ]);
-	                tI += move[0];
-	                tJ += move[1];
-	            }
-	        }
-	    }
-	    return nextMoves;
-	}
-
-    //Calculate next moves for knight or king pieces
-	var getKnightMoves = function (i, j, color, moves) {
-	    var nextMoves = [];
-	    for(var move of moves) {
-	        var tI = i + move[0];
-	        var tJ = j + move[1];
-	        if (!outOfBounds(tI, tJ)) {
-	            var box = $('#box-' + tI + '-' + tJ);
-	            if (!box.hasClass('placed') || box.attr('piece').indexOf(color) < 0) {
-	                nextMoves.push([tI, tJ]);
-	            }
-	        }
-	    }
-	    return nextMoves;
-	}
-
-    //Check if position i, j is in the board game
+    //Verifica se posicao i, j esta no tabuleiro
 	var outOfBounds = function (i, j) {
 	    return (i < 0 || i >= 4 || j < 0 || j >= 4);
 	}
 
-    //Show possible moves by add suggestion to boxes
+    //Mostra movimentos possiveis ao adicionar sugestoes aos boxes
 	var suggestNextMoves = function (nextMoves) {
 	    for(var move of nextMoves) {
 	        var box = $('#box-' + move[0] + '-' + move[1]);
@@ -538,15 +442,15 @@ $(document).ready(function() {
 
     //=============================================//
 
-    //Set up piece for clicked box
-	var setPiece = function (box, color, type) {
+    //Define carta para box clicado
+	var defineCarta = function (box, color, type) {
 	    //Check end game (if king is defeated)
-	    if (box.attr('piece').indexOf('king') >= 0) {
-	        showWinner(player);
+	    if (box.attr('carta').indexOf('king') >= 0) {
+	        showWinner(jogador);
 
-	        box.html(chessPieces[color][type]);
+	        box.html(cards[color][type]);
 	        box.addClass('placed');
-	        box.attr('piece', color + '-' + type);
+	        box.attr('carta', color + '-' + type);
 
 	        return;
 	    }
@@ -554,16 +458,16 @@ $(document).ready(function() {
 	    //Check if pawn reached the last line
 	    var j = parseInt(box.attr('id').charAt(6));
 	    if (type === 'pawn') {
-	        if ((player === 'black' && j === 7) ||
-                  (player === 'white' && j === 0)) {
+	        if ((jogador === 'vermelho' && j === 7) ||
+                  (jogador === 'azul' && j === 0)) {
 	            $('#game').css('opacity', '0.5');
 
 	            var option = $('#pawn-promotion-option');
 	            option.removeClass('hide');
-	            option.find('#queen').html(chessPieces[player].queen);
-	            option.find('#rook').html(chessPieces[player].rook);
-	            option.find('#knight').html(chessPieces[player].knight);
-	            option.find('#bishop').html(chessPieces[player].bishop);
+	            option.find('#queen').html(cards[jogador].queen);
+	            option.find('#rook').html(cards[jogador].rook);
+	            option.find('#knight').html(cards[jogador].knight);
+	            option.find('#bishop').html(cards[jogador].bishop);
 
 	            promotion = { box: box, color: color };
 
@@ -571,324 +475,324 @@ $(document).ready(function() {
 	        }
 	    }
 
-        //Define background-image on move
-	    if ((type === 'pawn' && player === 'black') || (type === 'pawn' && color === 'black')) {
-	        box.attr('style', 'background-image: url(\'cards/logoSIPAI-red.png\'); background-size: cover;');
-	    } else if ((type === 'pawn' && player === 'white') || (type === 'pawn' && color === 'white')) {
-	        box.attr('style', 'background-image: url(\'cards/logoSIPAI-blue.png\'); background-size: cover;');
-	    } else if ((type === 'knight' && player === 'black') || (type === 'knight' && color === 'black')) {
-	        box.attr('style', 'background-image: url(\'cards/logoNascentes-red.png\'); background-size: cover;');
-	    } else if ((type === 'knight' && player === 'white') || (type === 'knight' && color === 'white')) {
-	        box.attr('style', 'background-image: url(\'cards/logoNascentes-blue.png\'); background-size: cover;');
+	    //Define background-image
+	    if (type === 'pawn' && color === 'vermelho') {
+	        box.attr('style', 'background-image: url(\'cards/logoSIPAI-red.png\'); background-tamanho: cover;');
+	    } else if (type === 'pawn' && color === 'azul') {
+	        box.attr('style', 'background-image: url(\'cards/logoSIPAI-blue.png\'); background-tamanho: cover;');
+	    } else if (type === 'knight' && color === 'vermelho') {
+	        box.attr('style', 'background-image: url(\'cards/logoNascentes-red.png\'); background-tamanho: cover;');
+	    } else if (type === 'knight' && color === 'azul') {
+	        box.attr('style', 'background-image: url(\'cards/logoNascentes-blue.png\'); background-tamanho: cover;');
 	    }
 
-	    box.html(chessPieces[color][type]);
+	    box.html(cards[color][type]);
 	    box.addClass('placed');
-	    box.attr('piece', color + '-' + type);
+	    box.attr('carta', color + '-' + type);
 
 	}
 
-    //Delete selected element
+    //Apaga elemento selecionado
 	var deleteBox = function (box) {
 	    box.removeClass('placed');
 	    box.removeClass('selected');
 	    box.removeClass('suggest');
 	    box.html('');
-	    box.attr('piece', '');
-	    box.attr('style', '');
+	    box.attr('carta', '');
+	    box.attr('style', ''); //remove imagem do box agora vazio
 	}
 
-    //Default reserve state
+    //Sorteia cartas iniciais nas reservas
 	var setNewBoard = function (box, i, j, r) {
 	    if (r === 2) {
 	        if (i === 0) {
 	            cardNum = Math.floor((Math.random() * 6) + 1);
 	            if (cardNum === 1) {
-	                cardName = 'pawn';
+	                cardNome = 'pawn';
 	            } else if (cardNum === 2) {
-	                cardName = 'rook';
+	                cardNome = 'rook';
 	            } else if (cardNum === 3) {
-	                cardName = 'bishop';
+	                cardNome = 'bishop';
 	            } else if (cardNum === 4) {
-	                cardName = 'knight';
+	                cardNome = 'knight';
 	            } else if (cardNum === 5) {
-	                cardName = 'queen';
+	                cardNome = 'queen';
 	            } else if (cardNum === 6) {
-	                cardName = 'king';
+	                cardNome = 'king';
 	            }
-	            setPiece(box, 'white', cardName);
+	            defineCarta(box, 'azul', cardNome);
 	        } else if (i === 1) {
 	            cardNum = Math.floor((Math.random() * 6) + 1);
 	            if (cardNum === 1) {
-	                cardName = 'pawn';
+	                cardNome = 'pawn';
 	            } else if (cardNum === 2) {
-	                cardName = 'rook';
+	                cardNome = 'rook';
 	            } else if (cardNum === 3) {
-	                cardName = 'bishop';
+	                cardNome = 'bishop';
 	            } else if (cardNum === 4) {
-	                cardName = 'knight';
+	                cardNome = 'knight';
 	            } else if (cardNum === 5) {
-	                cardName = 'queen';
+	                cardNome = 'queen';
 	            } else if (cardNum === 6) {
-	                cardName = 'king';
+	                cardNome = 'king';
 	            }
-	            setPiece(box, 'white', cardName);
+	            defineCarta(box, 'azul', cardNome);
 	        } else if (i === 2) {
 	            cardNum = Math.floor((Math.random() * 6) + 1);
 	            if (cardNum === 1) {
-	                cardName = 'pawn';
+	                cardNome = 'pawn';
 	            } else if (cardNum === 2) {
-	                cardName = 'rook';
+	                cardNome = 'rook';
 	            } else if (cardNum === 3) {
-	                cardName = 'bishop';
+	                cardNome = 'bishop';
 	            } else if (cardNum === 4) {
-	                cardName = 'knight';
+	                cardNome = 'knight';
 	            } else if (cardNum === 5) {
-	                cardName = 'queen';
+	                cardNome = 'queen';
 	            } else if (cardNum === 6) {
-	                cardName = 'king';
+	                cardNome = 'king';
 	            }
-	            setPiece(box, 'white', cardName);
+	            defineCarta(box, 'azul', cardNome);
 	        } else if (i === 3) {
 	            cardNum = Math.floor((Math.random() * 6) + 1);
 	            if (cardNum === 1) {
-	                cardName = 'pawn';
+	                cardNome = 'pawn';
 	            } else if (cardNum === 2) {
-	                cardName = 'rook';
+	                cardNome = 'rook';
 	            } else if (cardNum === 3) {
-	                cardName = 'bishop';
+	                cardNome = 'bishop';
 	            } else if (cardNum === 4) {
-	                cardName = 'knight';
+	                cardNome = 'knight';
 	            } else if (cardNum === 5) {
-	                cardName = 'queen';
+	                cardNome = 'queen';
 	            } else if (cardNum === 6) {
-	                cardName = 'king';
+	                cardNome = 'king';
 	            }
-	            setPiece(box, 'white', cardName);
+	            defineCarta(box, 'azul', cardNome);
 	        } else if (i === 4) {
 	            cardNum = Math.floor((Math.random() * 6) + 1);
 	            if (cardNum === 1) {
-	                cardName = 'pawn';
+	                cardNome = 'pawn';
 	            } else if (cardNum === 2) {
-	                cardName = 'rook';
+	                cardNome = 'rook';
 	            } else if (cardNum === 3) {
-	                cardName = 'bishop';
+	                cardNome = 'bishop';
 	            } else if (cardNum === 4) {
-	                cardName = 'knight';
+	                cardNome = 'knight';
 	            } else if (cardNum === 5) {
-	                cardName = 'queen';
+	                cardNome = 'queen';
 	            } else if (cardNum === 6) {
-	                cardName = 'king';
+	                cardNome = 'king';
 	            }
-	            setPiece(box, 'white', cardName);
+	            defineCarta(box, 'azul', cardNome);
 	        } else if (i === 5) {
 	            cardNum = Math.floor((Math.random() * 6) + 1);
 	            if (cardNum === 1) {
-	                cardName = 'pawn';
+	                cardNome = 'pawn';
 	            } else if (cardNum === 2) {
-	                cardName = 'rook';
+	                cardNome = 'rook';
 	            } else if (cardNum === 3) {
-	                cardName = 'bishop';
+	                cardNome = 'bishop';
 	            } else if (cardNum === 4) {
-	                cardName = 'knight';
+	                cardNome = 'knight';
 	            } else if (cardNum === 5) {
-	                cardName = 'queen';
+	                cardNome = 'queen';
 	            } else if (cardNum === 6) {
-	                cardName = 'king';
+	                cardNome = 'king';
 	            }
-	            setPiece(box, 'white', cardName);
+	            defineCarta(box, 'azul', cardNome);
 	        } else if (i === 6) {
 	            cardNum = Math.floor((Math.random() * 6) + 1);
 	            if (cardNum === 1) {
-	                cardName = 'pawn';
+	                cardNome = 'pawn';
 	            } else if (cardNum === 2) {
-	                cardName = 'rook';
+	                cardNome = 'rook';
 	            } else if (cardNum === 3) {
-	                cardName = 'bishop';
+	                cardNome = 'bishop';
 	            } else if (cardNum === 4) {
-	                cardName = 'knight';
+	                cardNome = 'knight';
 	            } else if (cardNum === 5) {
-	                cardName = 'queen';
+	                cardNome = 'queen';
 	            } else if (cardNum === 6) {
-	                cardName = 'king';
+	                cardNome = 'king';
 	            }
-	            setPiece(box, 'white', cardName);
+	            defineCarta(box, 'azul', cardNome);
 	        } else if (i === 7) {
 	            cardNum = Math.floor((Math.random() * 6) + 1);
 	            if (cardNum === 1) {
-	                cardName = 'pawn';
+	                cardNome = 'pawn';
 	            } else if (cardNum === 2) {
-	                cardName = 'rook';
+	                cardNome = 'rook';
 	            } else if (cardNum === 3) {
-	                cardName = 'bishop';
+	                cardNome = 'bishop';
 	            } else if (cardNum === 4) {
-	                cardName = 'knight';
+	                cardNome = 'knight';
 	            } else if (cardNum === 5) {
-	                cardName = 'queen';
+	                cardNome = 'queen';
 	            } else if (cardNum === 6) {
-	                cardName = 'king';
+	                cardNome = 'king';
 	            }
-	            setPiece(box, 'white', cardName);
+	            defineCarta(box, 'azul', cardNome);
 	        }
 	    } else if (r === 1) {
 	        if (i === 0) {
 	            cardNum = Math.floor((Math.random() * 6) + 1);
 	            if (cardNum === 1) {
-	                cardName = 'pawn';
+	                cardNome = 'pawn';
 	            } else if (cardNum === 2) {
-	                cardName = 'rook';
+	                cardNome = 'rook';
 	            } else if (cardNum === 3) {
-	                cardName = 'bishop';
+	                cardNome = 'bishop';
 	            } else if (cardNum === 4) {
-	                cardName = 'knight';
+	                cardNome = 'knight';
 	            } else if (cardNum === 5) {
-	                cardName = 'queen';
+	                cardNome = 'queen';
 	            } else if (cardNum === 6) {
-	                cardName = 'king';
+	                cardNome = 'king';
 	            }
-	            setPiece(box, 'black', cardName);
+	            defineCarta(box, 'vermelho', cardNome);
 	        } else if (i === 1) {
 	            cardNum = Math.floor((Math.random() * 6) + 1);
 	            if (cardNum === 1) {
-	                cardName = 'pawn';
+	                cardNome = 'pawn';
 	            } else if (cardNum === 2) {
-	                cardName = 'rook';
+	                cardNome = 'rook';
 	            } else if (cardNum === 3) {
-	                cardName = 'bishop';
+	                cardNome = 'bishop';
 	            } else if (cardNum === 4) {
-	                cardName = 'knight';
+	                cardNome = 'knight';
 	            } else if (cardNum === 5) {
-	                cardName = 'queen';
+	                cardNome = 'queen';
 	            } else if (cardNum === 6) {
-	                cardName = 'king';
+	                cardNome = 'king';
 	            }
-	            setPiece(box, 'black', cardName);
+	            defineCarta(box, 'vermelho', cardNome);
 	        } else if (i === 2) {
 	            cardNum = Math.floor((Math.random() * 6) + 1);
 	            if (cardNum === 1) {
-	                cardName = 'pawn';
+	                cardNome = 'pawn';
 	            } else if (cardNum === 2) {
-	                cardName = 'rook';
+	                cardNome = 'rook';
 	            } else if (cardNum === 3) {
-	                cardName = 'bishop';
+	                cardNome = 'bishop';
 	            } else if (cardNum === 4) {
-	                cardName = 'knight';
+	                cardNome = 'knight';
 	            } else if (cardNum === 5) {
-	                cardName = 'queen';
+	                cardNome = 'queen';
 	            } else if (cardNum === 6) {
-	                cardName = 'king';
+	                cardNome = 'king';
 	            }
-	            setPiece(box, 'black', cardName);
+	            defineCarta(box, 'vermelho', cardNome);
 	        } else if (i === 3) {
 	            cardNum = Math.floor((Math.random() * 6) + 1);
 	            if (cardNum === 1) {
-	                cardName = 'pawn';
+	                cardNome = 'pawn';
 	            } else if (cardNum === 2) {
-	                cardName = 'rook';
+	                cardNome = 'rook';
 	            } else if (cardNum === 3) {
-	                cardName = 'bishop';
+	                cardNome = 'bishop';
 	            } else if (cardNum === 4) {
-	                cardName = 'knight';
+	                cardNome = 'knight';
 	            } else if (cardNum === 5) {
-	                cardName = 'queen';
+	                cardNome = 'queen';
 	            } else if (cardNum === 6) {
-	                cardName = 'king';
+	                cardNome = 'king';
 	            }
-	            setPiece(box, 'black', cardName);
+	            defineCarta(box, 'vermelho', cardNome);
 	        } else if (i === 4) {
 	            cardNum = Math.floor((Math.random() * 6) + 1);
 	            if (cardNum === 1) {
-	                cardName = 'pawn';
+	                cardNome = 'pawn';
 	            } else if (cardNum === 2) {
-	                cardName = 'rook';
+	                cardNome = 'rook';
 	            } else if (cardNum === 3) {
-	                cardName = 'bishop';
+	                cardNome = 'bishop';
 	            } else if (cardNum === 4) {
-	                cardName = 'knight';
+	                cardNome = 'knight';
 	            } else if (cardNum === 5) {
-	                cardName = 'queen';
+	                cardNome = 'queen';
 	            } else if (cardNum === 6) {
-	                cardName = 'king';
+	                cardNome = 'king';
 	            }
-	            setPiece(box, 'black', cardName);
+	            defineCarta(box, 'vermelho', cardNome);
 	        } else if (i === 5) {
 	            cardNum = Math.floor((Math.random() * 6) + 1);
 	            if (cardNum === 1) {
-	                cardName = 'pawn';
+	                cardNome = 'pawn';
 	            } else if (cardNum === 2) {
-	                cardName = 'rook';
+	                cardNome = 'rook';
 	            } else if (cardNum === 3) {
-	                cardName = 'bishop';
+	                cardNome = 'bishop';
 	            } else if (cardNum === 4) {
-	                cardName = 'knight';
+	                cardNome = 'knight';
 	            } else if (cardNum === 5) {
-	                cardName = 'queen';
+	                cardNome = 'queen';
 	            } else if (cardNum === 6) {
-	                cardName = 'king';
+	                cardNome = 'king';
 	            }
-	            setPiece(box, 'black', cardName);
+	            defineCarta(box, 'vermelho', cardNome);
 	        } else if (i === 6) {
 	            cardNum = Math.floor((Math.random() * 6) + 1);
 	            if (cardNum === 1) {
-	                cardName = 'pawn';
+	                cardNome = 'pawn';
 	            } else if (cardNum === 2) {
-	                cardName = 'rook';
+	                cardNome = 'rook';
 	            } else if (cardNum === 3) {
-	                cardName = 'bishop';
+	                cardNome = 'bishop';
 	            } else if (cardNum === 4) {
-	                cardName = 'knight';
+	                cardNome = 'knight';
 	            } else if (cardNum === 5) {
-	                cardName = 'queen';
+	                cardNome = 'queen';
 	            } else if (cardNum === 6) {
-	                cardName = 'king';
+	                cardNome = 'king';
 	            }
-	            setPiece(box, 'black', cardName);
+	            defineCarta(box, 'vermelho', cardNome);
 	        } else if (i === 7) {
 	            cardNum = Math.floor((Math.random() * 6) + 1);
 	            if (cardNum === 1) {
-	                cardName = 'pawn';
+	                cardNome = 'pawn';
 	            } else if (cardNum === 2) {
-	                cardName = 'rook';
+	                cardNome = 'rook';
 	            } else if (cardNum === 3) {
-	                cardName = 'bishop';
+	                cardNome = 'bishop';
 	            } else if (cardNum === 4) {
-	                cardName = 'knight';
+	                cardNome = 'knight';
 	            } else if (cardNum === 5) {
-	                cardName = 'queen';
+	                cardNome = 'queen';
 	            } else if (cardNum === 6) {
-	                cardName = 'king';
+	                cardNome = 'king';
 	            }
-	            setPiece(box, 'black', cardName);
+	            defineCarta(box, 'vermelho', cardNome);
 	        }
 	    }
 	}
 
-    //Switch player
-	var switchPlayer = function () {
-	    if (player === 'black') {
-	        $('#player').html(chessPieces.white.king);
-	        player = 'white';
+    //Troca jogador
+	var trocaJogador = function () {
+	    if (jogador === 'vermelho') {
+	        $('#jogador').html(cards.azul.king);
+	        jogador = 'azul';
 	    } else {
-	        $('#player').html(chessPieces.black.king);
-	        player = 'black';
+	        $('#jogador').html(cards.vermelho.king);
+	        jogador = 'vermelho';
 	    }
 	}
 
-    //Restart game
+    //Reinicia jogo
 	var resetGame = function () {
 	    deleteBox($('.box'));
-	    $('#player').html(chessPieces.black.king);
+	    $('#jogador').html(cards.vermelho.king);
 	    $('#result').addClass('hide');
 	    $('#option-menu').addClass('hide');
 	    $('#game').css('opacity', '1');
 
-	    //Set up color for boxes, cards
+	    //Define cores para boxes, cards
 	    for (var y = 0; y < 1; y++) {
 	        for (var x = 0; x < 8; x++) {
 	            var box = $('#box-R01-' + x + '-' + y);
 	            box.addClass('dark-box');
 	            r = 1;
-	            setNewBoard(box, x, y, r); //Set up player 1 cards
+	            setNewBoard(box, x, y, r); //Define cards do jogador 1
 	        }
 	    }
 	    for (var y = 0; y < 1; y++) {
@@ -896,16 +800,16 @@ $(document).ready(function() {
 	            var box = $('#box-R02-' + x + '-' + y);
 	            box.addClass('light-box');
 	            r = 2;
-	            setNewBoard(box, x, y, r); //Set up all player 2 cards
+	            setNewBoard(box, x, y, r); //Define cards do jogador 2
 	        }
 	    }
 
 
 	    //Set global variables to default
-	    player = 'black';
+	    jogador = 'vermelho';
 	    select = {
 	        canMove: false,
-	        piece: '',
+	        carta: '',
 	        box: ''
 	    };
 
@@ -925,7 +829,7 @@ $(document).ready(function() {
 	            $('#result').html(winner);
 	        } else { //There is a winner
 	            $('#result').css('color', winner + '');
-	            $('#result').html(chessPieces[winner].king + ' wins!');
+	            $('#result').html(cards[winner].king + ' wins!');
 	        }
 	        $('#result').removeClass('hide');
 	        $('#game').css('opacity', '0.5');
