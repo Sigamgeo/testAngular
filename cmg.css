@@ -8,7 +8,7 @@ body {
    margin: 10px auto;
 }
 
-/*=====BOARD GAME=================*/
+/*=====TABULEIRO=================*/
 
 #board {
     width: 480px;
@@ -136,7 +136,7 @@ body {
 	 line-height: 15px;
 }
 
-#player-nav {
+#jogador-nav {
     display: inline-block;
     cursor: default;
     float: left;
@@ -145,7 +145,7 @@ body {
 	 margin-top: 5px;
 }
 
-#player {
+#jogador {
     font-size: 32px;
     color: #000;
 }
@@ -236,7 +236,7 @@ body {
     cursor: pointer;
 }
 
-/* Responsive design */
+/* Design responsivo */
 
 @media only screen and (max-width: 570px) {
 	body {
@@ -271,18 +271,18 @@ body {
     }
     
     .option-nav {
-		  margin: 0 auto;
+		margin: 0 auto;
         width: 340px;
         font-size: 24px;
-		  line-height: 10px;
+		line-height: 10px;
     }
     
-	 #player-nav {
+	 #jogador-nav {
 		  width: 30%;
 	 	  margin-top: 5px;
 	 }
 	
-	 #player {
+	 #jogador {
 	     font-size: 28px;		
 	 }
 	
