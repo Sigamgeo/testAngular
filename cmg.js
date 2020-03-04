@@ -160,12 +160,10 @@ $(document).ready(function() {
         
         $('.box').css('color', color['color']);
         
-        $('#pawn-promotion-option').css('color', color['color']);
-        
         $('#jogador').css('color', color['color']);
     }
 	 
-	 //=====GLOBAL VARIABLES=========//
+	 //=====VARIAVEIS GLOBAIS=========//
 
 	//Cards
 	var cards = {
@@ -199,9 +197,6 @@ $(document).ready(function() {
 	//Game's history (cartas + positions)
 	var historyMoves = [];
 
-	//Position and color of pawn promotion
-	var promotion = {};
-
 
     //Define tabuleiro
 	$(function () {
@@ -221,7 +216,6 @@ $(document).ready(function() {
 	        for (var x = 0; x < 8; x++) {
 	            var box = $('#box-R02-' + x + '-' + y);
 	            box.addClass('ng-scope');
-	            //box.addClass('light-box');
 	            r = 2;
 	            setNewBoard(box, x, y, r); //Define todas as cartas
 	        }
@@ -281,20 +275,6 @@ $(document).ready(function() {
 	        select = { canMove: false, carta: '', box: '' };
 	    });
 
-	    //Pawn promotion event
-	    $('#pawn-promotion-option .option').on('click', function () {
-
-	        var newType = $(this).attr('id');
-	        promotion.box.html(cards[promotion.color][newType]);
-	        promotion.box.addClass('placed');
-	        promotion.box.attr('carta', promotion.color + '-' + newType);
-
-	        $('#pawn-promotion-option').addClass('hide');
-	        $('#game').css('opacity', '1');
-
-	        promotion = {};
-	    });
-
 	    //Reinicia jogo
 	    $('#restart-btn').on('click', function () {
 	        resetGame();
@@ -342,7 +322,7 @@ $(document).ready(function() {
 	            //Pode mover se e valido
 	            if ($(this).hasClass('suggest')) {
 
-	                //Salava movimento no historico
+	                //Salva movimento no historico
 	                var move = {
 	                    previous: {},
 	                    current: {}
@@ -355,6 +335,8 @@ $(document).ready(function() {
 	                move.current.box = $(this).attr('id');
 
 	                historyMoves.push(move);
+
+	                console.log(historyMoves); //max 16
 
 	                //Move carta selecionada com sucesso
 	                defineCarta($(this), color, type);
@@ -436,35 +418,34 @@ $(document).ready(function() {
 
     //Define carta para box clicado
 	var defineCarta = function (box, color, type) {
-	    //Check end game (if king is defeated)
-	    if (box.attr('carta').indexOf('king') >= 0) {
-	        showWinner(jogador);
+        //Verifica se o jogo acabou (16 movimentos)
+	    if (historyMoves.length == 16) {
+	        contVerm = 0;
+	        contAzul = 0;
+            //varre o tabuleiro para contagem de cores
+	        for (var y = 0; y < 4; y++) {
+	            for (var x = 0; x < 4; x++) {
+	                if ($('#box-' + x + '-' + y).attr('carta').split('-')[0] == 'vermelho') {
+	                    contVerm += 1;
+	                } else if ($('#box-' + x + '-' + y).attr('carta').split('-')[0] == 'azul') {
+	                    contAzul += 1;
+	                }
+	            }
+	        }
+
+	        if (contVerm > contAzul) {
+	            showWinner('vermelho');
+	        } else if (contAzul > contVermelho) {
+	            showWinner('azul');
+	        } else {
+	            showWinner('DRAW');
+	        }
 
 	        box.html(cards[color][type]);
 	        box.addClass('placed');
 	        box.attr('carta', color + '-' + type);
 
 	        return;
-	    }
-
-	    //Check if pawn reached the last line
-	    var j = parseInt(box.attr('id').charAt(6));
-	    if (type === 'pawn') {
-	        if ((jogador === 'vermelho' && j === 7) ||
-                  (jogador === 'azul' && j === 0)) {
-	            $('#game').css('opacity', '0.5');
-
-	            var option = $('#pawn-promotion-option');
-	            option.removeClass('hide');
-	            option.find('#queen').html(cards[jogador].queen);
-	            option.find('#rook').html(cards[jogador].rook);
-	            option.find('#knight').html(cards[jogador].knight);
-	            option.find('#bishop').html(cards[jogador].bishop);
-
-	            promotion = { box: box, color: color };
-
-	            return;
-	        }
 	    }
 
 	    //Define background-image
@@ -806,14 +787,12 @@ $(document).ready(function() {
 	    };
 
 	    historyMoves = [];
-	    promotion = {};
 	}
 
     //Anuncia o vencedor
 	var showWinner = function (winner) {
 
 	    historyMoves = [];
-	    promotion = {};
 
 	    setTimeout(function () {
 	        if (winner === 'DRAW') { //Jogo empatou
